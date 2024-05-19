@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="register.js" defer></script>
+</head>
+
+<body>
+    <h2>Registrar usuario</h2>
+    <form id="registerForm">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" required title="Nombre" placeholder="Ingrese su nombre"><br>
+        <label>Apellido:</label>
+        <input type="text" name="apellido" required title="Apellido" placeholder="Ingrese su apellido"><br>
+        <label>Email:</label>
+        <input type="email" name="email" required title="Email" placeholder="Ingrese su email"><br>
+        <label>Usuario:</label>
+        <input type="text" name="usuario" required title="Usuario" placeholder="Ingrese su usuario"><br>
+        <label>Contraseña:</label>
+        <input type="password" name="contrasena" required title="Contraseña" placeholder="Ingrese su contraseña"><br>
+        <label>Rol:</label>
+        <select name="rol" id="rol" required title="Rol" placeholder="Seleccione un rol"></select><br>
+        <input type="submit" value="Registrar usuario">
+    </form>
+    <a href="dashboard.php" class="button">Volver al Dashboard</a>
+</body>
+
+</html>
+
+</html>

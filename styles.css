@@ -36,6 +36,21 @@ nav a:hover {
   text-decoration: underline;
 }
 
+nav button {
+  color: white;
+  margin: 0 15px;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+nav button:hover {
+  text-decoration: underline;
+}
+
 .card {
   max-width: 600px;
   margin: 20px auto;

@@ -24,4 +24,3 @@ if ($_SESSION["usuario_rol"] != 1) {
     showAlert("No tienes permiso para acceder a esta página.", "../dashboard.php");
     exit();
 }
-?>

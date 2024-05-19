@@ -7,6 +7,7 @@
     <title>Aerolínea La Nube Voladora Dashboard</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="logout.js" defer></script> <!-- Incluir logout.js -->
 </head>
 
 <body>
@@ -69,7 +70,9 @@
     echo "<nav>";
     echo "<a href='dashboard.php'>Dashboard</a>";
     if ($_SESSION["usuario_rol"] == 1) {
-        echo "<a href='register.php'>Registrar Usuarios</a>";
+        echo "<a href='register.html'>Registrar Usuarios</a>";
+        echo "<a href='administracion_roles/permission_table.php'>Ir a la tabla de permisos</a>";
+        echo "<a href='administracion_roles/user_roles.php'>Asignar roles a usuarios</a>";
     }
     if (array_key_exists(1, $permisos)) {
         echo "<a href='registrar_vuelos/registrar_vuelo.php'>Registrar Vuelo</a>";
@@ -77,8 +80,11 @@
     }
     if (array_key_exists(2, $permisos)) {
         echo "<a href='vender_billete/buscar_vuelo.php'>Buscar Vuelo</a>";
+        echo "<a href='vender_billete/buscar_billete.php'>Buscar billete</a>";
+        echo "<a href='vender_billete/descargar_informacion_vuelo.php'>Descargar informacion de vuelo</a>";
     }
-    echo "<a href='logout.php'>Cerrar Sesión</a>";
+    // Cambiar el enlace de logout para usar un botón
+    echo "<button id='logoutBtn'>Cerrar Sesión</button>";
     echo "</nav>";
 
     echo "<h1>Bienvenido, $usuario_nombre<br></h1>";
