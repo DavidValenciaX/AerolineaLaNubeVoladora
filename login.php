@@ -2,6 +2,8 @@
 session_start();
 require_once 'conexion.php';
 
+$response = ["success" => false, "message" => ""];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario = $_POST["usuario"];
     $contrasena = $_POST["contrasena"];
@@ -18,31 +20,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["usuario_ID"] = $row["ID"];
             $_SESSION["usuario_nombre"] = $row["nombre"];
             $_SESSION["usuario_rol"] = $row["rol_ID"];
-            header("Location: dashboard.php");
-            exit();
+            $response["success"] = true;
+            $response["message"] = "Inicio de sesión exitoso.";
         } else {
-            echo "Contraseña incorrecta.";
+            $response["message"] = "Contraseña incorrecta.";
         }
     } else {
-        echo "Usuario no encontrado.";
+        $response["message"] = "Usuario no encontrado.";
     }
-}
-?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
-<body>
-    <h2>Login</h2>
-    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-        <label>Usuario:</label>
-        <input type="text" name="usuario" required><br>
-        <label>Contraseña:</label>
-        <input type="password" name="contrasena" required><br>
-        <input type="submit" value="Iniciar sesión">
-    </form>
-</body>
-</html>
+    // Devuelve la respuesta en formato JSON
+    echo json_encode($response);
+    exit();
+}

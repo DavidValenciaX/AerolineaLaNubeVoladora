@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+
+</html>
+
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+        #error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h2>Login</h2>
+    <p id="error-message"></p>
+    <form id="login-form">
+        <label>Usuario:</label>
+        <input type="text" name="usuario" required placeholder="Ingrese su usuario" title="Campo de usuario"><br>
+        <label>Contraseña:</label>
+        <input type="password" name="contrasena" required placeholder="Ingrese su contraseña" title="Campo de contraseña"><br>
+        <input type="submit" value="Iniciar sesión">
+    </form>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'login.php', true);
+            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        window.location.href = 'dashboard.php';
+                    } else {
+                        document.getElementById('error-message').textContent = response.message;
+                    }
+                } else {
+                    document.getElementById('error-message').textContent = 'Error en la solicitud. Intente de nuevo.';
+                }
+            };
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>
+
+</html>
+
+</html>
