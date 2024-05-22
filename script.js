@@ -30,8 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (permisosArray.includes("registrar vuelos")) {
           permisosHtml += `
-              <a href='registrar_vuelo.html'>Registrar Vuelo</a>
               <a href='agregar_avion.html'>Agregar Avión</a>
+              <a href='registrar_vuelo.html'>Registrar Vuelo</a>
             `;
         }
 
@@ -44,13 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         navbar.innerHTML = `
-            <a href='dashboard.html'>Dashboard</a>
+            <a href='index.html'>Dashboard</a>
             ${
-              data.usuario_rol === "Administrador"
+              data.usuario_rol === "Superusuario"
                 ? `
             <a href='register.html'>Registrar Usuarios</a>
-            <a href='permission_table.html'>Ir a la tabla de permisos</a>
-            <a href='user_roles.html'>Asignar roles a usuarios</a>
+            <a href='administracion_roles/permission_table.html'>Ir a la tabla de permisos</a>
+            <a href='administracion_roles/asignar_roles.html'>Asignar roles a usuarios</a>
             `
                 : ""
             }
@@ -63,10 +63,11 @@ document.addEventListener("DOMContentLoaded", () => {
             .then((response) => response.json())
             .then((data) => {
               Swal.fire({
-                title: "Alerta",
+                title: "Cerrando sesión",
+                icon: "success",
                 text: data.message,
-                icon: "warning",
-                confirmButtonText: "Aceptar",
+                showConfirmButton: false,
+                timer: 1000,
               }).then(() => {
                 window.location.href = "login.html";
               });

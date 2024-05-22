@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Roles a Usuarios</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+
+<body>
+    <h2>Asignar Roles a Usuarios</h2>
+    <form id="rolesForm">
+        <table id="rolesTable">
+            <tr>
+                <th>Usuario</th>
+                <th>Rol Actual</th>
+                <th>Nuevo Rol</th>
+            </tr>
+        </table>
+        <input type="submit" value="Guardar Roles">
+    </form>
+    <p><a href="../index.html" class="button">Volver al dashboard</a></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Obtener los usuarios y roles
+            fetch('/user-service/get_users_roles.php')
+                .then(response => response.json())
+                .then(data => {
+                    const usuarios = data.usuarios;
+                    const roles = data.roles;
+                    const rolesTable = document.getElementById('rolesTable');
+                    
+                    usuarios.forEach(usuario => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${usuario.nombre} ${usuario.apellido} (${usuario.email})</td>
+                            <td>${usuario.rol}</td>
+                            <td>
+                                <select name="user_roles[${usuario.ID}]">
+                                    ${roles.map(rol => `
+                                        <option value="${rol.ID}" ${usuario.rol === rol.nombre ? 'selected' : ''}>
+                                            ${rol.nombre}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </td>
+                        `;
+                        rolesTable.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+
+            // Manejar el envío del formulario
+            document.getElementById('rolesForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const params = new URLSearchParams(formData);
+
+                fetch('/user-service/update_roles.php', {
+                    method: 'POST',
+                    body: params,
+                })
+                .then(response => response.json())
+                .then(response => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: response.message,
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+</body>
+
+</html>

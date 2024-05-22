@@ -102,7 +102,7 @@
                 } else {
                     echo "<td>Disponible</td>";
                 }
-                echo "<td><a href='descargar_cvs.php?vuelo_id=" . $row["ID"] . "'>Descargar información de vuelo</a></td>";
+                echo "<td><a href='descargar_csv.php?vuelo_id=" . $row["ID"] . "'>Descargar información de vuelo</a></td>";
                 echo "</tr>";
             }
             echo "</table>";

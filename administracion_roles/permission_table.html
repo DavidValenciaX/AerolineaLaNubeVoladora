@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Permisos</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+    <h2>Tabla de Permisos</h2>
+    <form id="permissionsForm">
+        <table id="permissionsTable">
+            <!-- La tabla se rellenará mediante AJAX -->
+        </table>
+        <input type="submit" value="Guardar permisos">
+    </form>
+    <p><a href="../index.html" class="button">Volver al dashboard</a></p>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Cargar roles y permisos
+            fetch('/user-service/load_permissions.php')
+                .then(response => response.json())
+                .then(data => {
+                    let table = document.getElementById('permissionsTable');
+                    let header = '<tr><th>Rol</th>';
+                    data.permisos.forEach(function (permiso) {
+                        header += '<th>' + permiso.nombre + '</th>';
+                    });
+                    header += '</tr>';
+                    table.innerHTML += header;
+
+                    data.roles.forEach(function (rol) {
+                        let row = '<tr><td>' + rol.nombre + '</td>';
+                        data.permisos.forEach(function (permiso) {
+                            let checked = rol.permisos.includes(permiso.ID) ? 'checked' : '';
+                            row += `<td><input type='checkbox' name='permisos[${rol.ID}][]' value='${permiso.ID}' ${checked}></td>`;
+                        });
+                        row += '</tr>';
+                        table.innerHTML += row;
+                    });
+                });
+
+            // Enviar formulario
+            document.getElementById('permissionsForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                fetch('/user-service/save_permissions.php', {
+                    method: 'POST',
+                    body: new FormData(this)
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        Swal.fire('Éxito', data, 'success');
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Hubo un problema al guardar los permisos.', 'error');
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
+</html>
