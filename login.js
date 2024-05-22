@@ -14,7 +14,7 @@ document
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          window.location.href = "/frontend/dashboard.php";
+          window.location.href = "/frontend/index.html";
         } else {
           document.getElementById("error-message").textContent = data.message;
         }
