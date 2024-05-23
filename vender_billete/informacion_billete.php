@@ -13,8 +13,6 @@
 <body>
     <?php
 
-    require 'validar_permiso_vender_billete.php';
-
 
 
     if (isset($_GET['billete'])) {

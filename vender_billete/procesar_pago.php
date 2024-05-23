@@ -10,8 +10,6 @@
 <body>
     <?php
 
-    require 'validar_permiso_vender_billete.php';
-
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $vuelo_id = $_POST["vuelo_id"];
 

@@ -31,7 +31,6 @@
 <body>
     <h2>Seleccionar Asiento</h2>
     <?php
-    require 'validar_permiso_vender_billete.php';
 
     if (isset($_GET["vuelo_id"])) {
         $vuelo_id = $_GET["vuelo_id"];

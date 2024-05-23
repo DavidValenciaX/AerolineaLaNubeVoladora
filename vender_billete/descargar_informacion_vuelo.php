@@ -8,10 +8,6 @@
 </head>
 
 <body>
-   
-    <?php
-    require 'validar_permiso_vender_billete.php';
-    ?>
   
 
     <h2>Buscar Vuelo</h2>

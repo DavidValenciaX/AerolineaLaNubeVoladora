@@ -1,5 +1,4 @@
 <?php
-require 'validar_permiso_vender_billete.php';
 
 
 // Verifica si se ha pasado un ID de vuelo
@@ -73,4 +72,3 @@ fclose($output);
 $stmtVuelo->close();
 $stmtPasajeros->close();
 $conexion->close();
-?>
