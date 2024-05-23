@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buscar Vuelo</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+    <h2>Buscar Vuelo</h2>
+    <form id="buscarVueloForm">
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" name="fecha"><br><br>
+        <label for="origen">Origen:</label>
+        <select id="origen" name="origen">
+            <option value="">Seleccione el origen</option>
+        </select><br><br>
+        <label for="destino">Destino:</label>
+        <select id="destino" name="destino">
+            <option value="">Seleccione el destino</option>
+        </select><br><br>
+        <input type="submit" name="buscar" value="Buscar">
+    </form>
+
+    <div id="resultados"></div>
+
+    <br>
+    <a href="../index.html" class="button">Volver al Dashboard</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('http://localhost/flight-service/obtener_origenes_destinos.php')
+                .then(response => response.json())
+                .then(data => {
+                    const origenSelect = document.getElementById('origen');
+                    const destinoSelect = document.getElementById('destino');
+
+                    data.origenes.forEach(origen => {
+                        const option = document.createElement('option');
+                        option.value = origen;
+                        option.textContent = origen;
+                        origenSelect.appendChild(option);
+                    });
+
+                    data.destinos.forEach(destino => {
+                        const option = document.createElement('option');
+                        option.value = destino;
+                        option.textContent = destino;
+                        destinoSelect.appendChild(option);
+                    });
+                });
+        });
+
+        document.getElementById('buscarVueloForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                fecha: document.getElementById('fecha').value,
+                origen: document.getElementById('origen').value,
+                destino: document.getElementById('destino').value
+            };
+
+            fetch('http://localhost/flight-service/buscar_vuelo.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultadosDiv = document.getElementById('resultados');
+                resultadosDiv.innerHTML = '';
+
+                if (data.length > 0) {
+                    const table = document.createElement('table');
+                    table.border = '1';
+
+                    const header = table.insertRow();
+                    ['ID', 'Avión', 'Fecha', 'Origen', 'Destino', 'Precio', 'Hora', 'Asientos Disponibles', 'Estado', 'Acciones'].forEach(text => {
+                        const cell = header.insertCell();
+                        cell.textContent = text;
+                    });
+
+                    data.forEach(vuelo => {
+                        const row = table.insertRow();
+                        row.insertCell().textContent = vuelo.ID;
+                        row.insertCell().textContent = vuelo.Modelo;
+                        row.insertCell().textContent = vuelo.Fecha;
+                        row.insertCell().textContent = vuelo.Origen;
+                        row.insertCell().textContent = vuelo.Destino;
+                        row.insertCell().textContent = vuelo.Precio;
+                        row.insertCell().textContent = vuelo.Hora;
+                        row.insertCell().textContent = vuelo.asientos_disponibles;
+                        row.insertCell().textContent = vuelo.asientos_disponibles == 0 ? 'El vuelo está lleno' : 'Disponible';
+                        const actionCell = row.insertCell();
+                        const actionLink = document.createElement('a');
+                        actionLink.href = `seleccionar_asiento.html?vuelo_id=${vuelo.ID}`;
+                        actionLink.textContent = 'Seleccionar asiento';
+                        actionCell.appendChild(actionLink);
+                    });
+
+                    resultadosDiv.appendChild(table);
+                } else {
+                    resultadosDiv.textContent = 'No se encontraron vuelos que coincidan con los criterios de búsqueda.';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

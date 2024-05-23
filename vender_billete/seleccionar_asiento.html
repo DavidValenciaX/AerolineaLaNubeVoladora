@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seleccionar Asiento</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <style>
+        .asiento-disponible { background-color: lightgreen; }
+        .asiento-ocupado { background-color: lightcoral; }
+        table { border-collapse: collapse; margin: 20px 0; font-size: 18px; text-align: left; }
+        table th, table td { padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h2>Seleccionar Asiento</h2>
+    <form id="seleccionarAsientoForm">
+        <input type="hidden" id="vuelo_id" name="vuelo_id" value="">
+
+        <div id="vueloDetalles"></div>
+        
+        <label for="asiento">Seleccione un asiento:</label><br>
+        <div id="asientos"></div>
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+        <label for="apellidos">Apellidos:</label>
+        <input type="text" id="apellidos" name="apellidos" required><br><br>
+        <label for="fecha_nac">Fecha de Nacimiento:</label>
+        <input type="date" id="fecha_nac" name="fecha_nac" required><br><br>
+        <label for="sexo">Sexo:</label>
+        <select id="sexo" name="sexo" required>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+        </select><br><br>
+        <input type="submit" value="Pagar">
+    </form>
+    <br>
+    <a href="buscar_vuelo.html" class="button">Volver a Buscar Vuelo</a>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const vuelo_id = urlParams.get('vuelo_id');
+        document.getElementById('vuelo_id').value = vuelo_id;
+
+        fetch(`http://localhost/flight-service/obtener_detalles_vuelo.php?vuelo_id=${vuelo_id}`)
+            .then(response => response.json())
+            .then(vuelo => {
+                const vueloDetalles = document.getElementById('vueloDetalles');
+                vueloDetalles.innerHTML = `
+                    <h3>Vuelo ID: ${vuelo.ID}</h3>
+                    <h3>Avión: ${vuelo.Modelo}</h3>
+                    <h3>Fecha: ${vuelo.Fecha}</h3>
+                    <h3>Origen: ${vuelo.Origen}</h3>
+                    <h3>Destino: ${vuelo.Destino}</h3>
+                    <h3>Hora: ${vuelo.Hora}</h3>
+                `;
+
+                const asientosDiv = document.getElementById('asientos');
+                const table = document.createElement('table');
+                for (let i = 1; i <= vuelo.Columnas; i++) {
+                    const row = table.insertRow();
+                    for (let j = 1; j <= vuelo.Filas; j++) {
+                        const asiento = String.fromCharCode(64 + i) + j;
+                        const cell = row.insertCell();
+                        cell.className = vuelo.asientos_ocupados.includes(asiento) ? 'asiento-ocupado' : 'asiento-disponible';
+                        cell.innerHTML = `<label><input type="radio" name="asiento" value="${asiento}" ${vuelo.asientos_ocupados.includes(asiento) ? 'disabled' : ''}> ${asiento}</label>`;
+                    }
+                }
+                asientosDiv.appendChild(table);
+            });
+
+        document.getElementById('seleccionarAsientoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                vuelo_id: document.getElementById('vuelo_id').value,
+                asiento: document.querySelector('input[name="asiento"]:checked').value,
+                nombre: document.getElementById('nombre').value,
+                apellidos: document.getElementById('apellidos').value,
+                fecha_nac: document.getElementById('fecha_nac').value,
+                sexo: document.getElementById('sexo').value
+            };
+
+            fetch('http://localhost/flight-service/procesar_pago.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: `Pago realizado y asiento reservado exitosamente. Su código de billete es: ${data.billete}`,
+                        icon: 'success'
+                    }).then(() => {
+                        window.location.href = `informacion_billete.html?billete=${data.billete}`;
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message,
+                        icon: 'error'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

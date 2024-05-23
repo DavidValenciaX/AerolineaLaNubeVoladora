@@ -50,9 +50,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (permisosArray.includes("vender billete")) {
       permisosHtml += `
-        <a href='buscar_vuelo.html'>Buscar Vuelo</a>
-        <a href='buscar_billete.html'>Buscar billete</a>
-        <a href='descargar_informacion_vuelo.html'>Descargar informacion de vuelo</a>
+        <a href='vender_billete/buscar_vuelo.html'>Buscar Vuelo</a>
+        <a href='vender_billete/buscar_billete.html'>Buscar billete</a>
+        <a href='vender_billete/descargar_informacion_vuelo.html'>Descargar informacion de vuelo</a>
       `;
     }
 

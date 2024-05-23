@@ -3,38 +3,28 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Buscar Billete</title>
+    <title>Información del Billete</title>
     <link rel="stylesheet" type="text/css" href="../styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <h2>Buscar Billete</h2>
-    <form id="buscarBilleteForm">
-        <label for="billete">Número de Billete:</label>
-        <input type="text" id="billete" name="billete" required><br><br>
-        <input type="submit" name="buscar" value="Buscar">
-    </form>
-
-    <div id="result"></div>
-
+    <h2>Información del Billete</h2>
+    <div id="billeteInfo"></div>
     <br>
     <a href="../index.html" class="button">Volver al Dashboard</a>
 
     <script>
-        document.getElementById('buscarBilleteForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const billete = document.getElementById('billete').value;
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const billete = urlParams.get('billete');
 
-            fetch(`http://localhost/flight-service/buscar_billete.php?billete=${billete}`)
+            fetch(`http://localhost/flight-service/obtener_informacion_billete.php?billete=${billete}`)
                 .then(response => response.json())
                 .then(data => {
-                    const resultDiv = document.getElementById('result');
-                    resultDiv.innerHTML = '';
-
+                    const billeteInfoDiv = document.getElementById('billeteInfo');
                     if (data.Billete) {
-                        resultDiv.innerHTML = `
+                        billeteInfoDiv.innerHTML = `
                             <div class='card'>
-                                <h1>Información del Billete</h1>
                                 <p><strong>Número de Billete:</strong> ${data.Billete}</p>
                                 <p><strong>Nombre:</strong> ${data.Nombre} ${data.Apellidos}</p>
                                 <p><strong>Fecha de viaje:</strong> ${data.Fecha}</p>
@@ -50,6 +40,8 @@
                             title: 'Error',
                             text: 'No se encontró la información del billete.',
                             icon: 'error'
+                        }).then(() => {
+                            window.location.href = '../index.html';
                         });
                     }
                 });
