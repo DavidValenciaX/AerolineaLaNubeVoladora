@@ -25,7 +25,7 @@
         <input type="submit" value="Agregar Avión">
     </form>
     <br>
-    <a href="../dashboard.php" class="button">Volver al Dashboard</a>
+    <a href="../index.html" class="button">Volver al Dashboard</a>
 </body>
 
 </html>

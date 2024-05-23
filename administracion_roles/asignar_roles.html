@@ -25,33 +25,46 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Obtener los usuarios y roles
-            fetch('/user-service/get_users_roles.php')
+            // Obtener los usuarios
+            fetch('http://localhost/user-service/get_users.php')
                 .then(response => response.json())
                 .then(data => {
                     const usuarios = data.usuarios;
-                    const roles = data.roles;
-                    const rolesTable = document.getElementById('rolesTable');
-                    
-                    usuarios.forEach(usuario => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${usuario.nombre} ${usuario.apellido} (${usuario.email})</td>
-                            <td>${usuario.rol}</td>
-                            <td>
-                                <select name="user_roles[${usuario.ID}]">
-                                    ${roles.map(rol => `
-                                        <option value="${rol.ID}" ${usuario.rol === rol.nombre ? 'selected' : ''}>
-                                            ${rol.nombre}
-                                        </option>
-                                    `).join('')}
-                                </select>
-                            </td>
-                        `;
-                        rolesTable.appendChild(row);
-                    });
+                    fetchRoles(usuarios);
                 })
                 .catch(error => console.error('Error:', error));
+
+            function fetchRoles(usuarios) {
+                fetch('http://localhost/user-service/get_roles.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const roles = data.roles;
+                        renderTable(usuarios, roles);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            function renderTable(usuarios, roles) {
+                const rolesTable = document.getElementById('rolesTable');
+                
+                usuarios.forEach(usuario => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${usuario.nombre} ${usuario.apellido} (${usuario.email})</td>
+                        <td>${usuario.rol}</td>
+                        <td>
+                            <select name="user_roles[${usuario.ID}]">
+                                ${roles.map(rol => `
+                                    <option value="${rol.ID}" ${usuario.rol === rol.nombre ? 'selected' : ''}>
+                                        ${rol.nombre}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </td>
+                    `;
+                    rolesTable.appendChild(row);
+                });
+            }
 
             // Manejar el envío del formulario
             document.getElementById('rolesForm').addEventListener('submit', function (e) {
@@ -60,7 +73,7 @@
                 const formData = new FormData(this);
                 const params = new URLSearchParams(formData);
 
-                fetch('/user-service/update_roles.php', {
+                fetch('http://localhost/user-service/update_roles.php', {
                     method: 'POST',
                     body: params,
                 })

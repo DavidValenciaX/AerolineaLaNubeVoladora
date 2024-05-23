@@ -11,7 +11,7 @@
     <h2>Tabla de Permisos</h2>
     <form id="permissionsForm">
         <table id="permissionsTable">
-            <!-- La tabla se rellenará mediante AJAX -->
+            <!-- La tabla se rellenará mediante javascript -->
         </table>
         <input type="submit" value="Guardar permisos">
     </form>
@@ -19,7 +19,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Cargar roles y permisos
-            fetch('/user-service/load_permissions.php')
+            fetch('http://localhost/user-service/get_permissions_by_role.php')
                 .then(response => response.json())
                 .then(data => {
                     let table = document.getElementById('permissionsTable');
@@ -44,7 +44,7 @@
             // Enviar formulario
             document.getElementById('permissionsForm').addEventListener('submit', function (event) {
                 event.preventDefault();
-                fetch('/user-service/save_permissions.php', {
+                fetch('http://localhost/user-service/save_permissions.php', {
                     method: 'POST',
                     body: new FormData(this)
                 })

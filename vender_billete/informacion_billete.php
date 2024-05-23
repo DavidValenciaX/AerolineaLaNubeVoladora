@@ -45,7 +45,7 @@
             echo "<p><strong>Avión:</strong> " . $row["Modelo"] . "</p>";
             echo "<p><strong>Asiento:</strong> " . $row["Asiento"] . "</p>";
             echo "</div>";
-            echo "<a href='../dashboard.php' class='button'>Volver al Dashboard</a>";
+            echo "<a href='../index.html' class='button'>Volver al Dashboard</a>";
         } else {
             echo "<script>
             Swal.fire({
@@ -54,7 +54,7 @@
                 icon: 'error'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '../dashboard.php';
+                    window.location.href = '../index.html';
                 }
             });
         </script>";
@@ -69,7 +69,7 @@
             icon: 'error'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = '../dashboard.php';
+                window.location.href = '../index.html';
             }
         });
     </script>";

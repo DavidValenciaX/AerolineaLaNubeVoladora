@@ -50,11 +50,10 @@ if ($result->num_rows > 0) {
     $resultPermiso = $stmtPermiso->get_result();
 
     if ($resultPermiso->num_rows == 0) {
-        showAlert("No tienes permiso para acceder a esta página.", "../dashboard.php");
+        showAlert("No tienes permiso para acceder a esta página.", "../index.html");
         exit();
     }
 } else {
     showAlert("Usuario no encontrado.");
     exit();
 }
-?>

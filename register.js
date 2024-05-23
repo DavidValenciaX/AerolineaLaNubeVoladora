@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-  fetch("http://localhost/user-service/get-roles.php")
+  fetch("http://localhost/user-service/get_roles.php")
     .then((response) => response.json())
-    .then((roles) => {
+    .then((data) => {
+      const roles = data.roles;
       const rolSelect = document.getElementById("rol");
       roles.forEach((rol) => {
         const option = document.createElement("option");
@@ -36,9 +37,21 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            window.location.href = "login.html";
+            Swal.fire({
+              title: "¡Registro exitoso!",
+              text: "El usuario ha sido registrado exitosamente.",
+              icon: "success",
+              confirmButtonText: "Aceptar",
+            }).then(() => {
+              window.location.href = "login.html";
+            });
           } else {
-            alert("Error al registrar: " + data.message);
+            Swal.fire({
+              title: "Error",
+              text: "Error al registrar: " + data.message,
+              icon: "error",
+              confirmButtonText: "Aceptar",
+            });
           }
         })
         .catch((error) => console.error("Error:", error));
