@@ -122,6 +122,15 @@
                                         actionLink.href = `seleccionar_asiento.html?vuelo_id=${vuelo.ID}`;
                                         actionLink.textContent = 'Seleccionar asiento';
                                         actionCell.appendChild(actionLink);
+                                        
+                                        const downloadLink = document.createElement('a');
+                                        downloadLink.href = "#";
+                                        downloadLink.textContent = 'Descargar información de vuelo';
+                                        downloadLink.onclick = function() {
+                                            descargarInformacionVuelo(vuelo.ID);
+                                        };
+                                        actionCell.appendChild(document.createElement('br'));
+                                        actionCell.appendChild(downloadLink);
                                     });
                             });
                     });
@@ -132,6 +141,22 @@
                 }
             });
         });
+
+        function descargarInformacionVuelo(vueloId) {
+            fetch(`http://localhost/flight-service/index.php?action=read_vuelo&id=${vueloId}`)
+                .then(response => response.json())
+                .then(vuelo => {
+                    const csvContent = `ID,Avion_ID,Fecha,Origen,Destino,Precio,Hora\n${vuelo.ID},${vuelo.Avion_ID},${vuelo.Fecha},${vuelo.Origen},${vuelo.Destino},${vuelo.Precio},${vuelo.Hora}`;
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `vuelo_${vueloId}.csv`;
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+        }
     </script>
 </body>
 </html>
