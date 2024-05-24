@@ -73,10 +73,10 @@
                                 // Mostrar asientos
                                 const asientosDiv = document.getElementById('asientos');
                                 const table = document.createElement('table');
-                                for (let i = 1; i <= avion.Columnas; i++) {
+                                for (let i = 1; i <= avion.Filas; i++) {
                                     const row = table.insertRow();
-                                    for (let j = 1; j <= avion.Filas; j++) {
-                                        const asiento = String.fromCharCode(64 + i) + j;
+                                    for (let j = 1; j <= avion.Columnas; j++) {
+                                        const asiento = String.fromCharCode(64 + j) + i;
                                         const cell = row.insertCell();
                                         cell.className = asientosOcupados.includes(asiento) ? 'asiento-ocupado' : 'asiento-disponible';
                                         cell.innerHTML = `<label><input type="radio" name="asiento" value="${asiento}" ${asientosOcupados.includes(asiento) ? 'disabled' : ''}> ${asiento}</label>`;
