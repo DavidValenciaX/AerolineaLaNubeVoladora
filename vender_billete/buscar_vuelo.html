@@ -29,8 +29,6 @@
     <a href="../index.html" class="button">Volver al Dashboard</a>
 
     <script>
-        let aviones = [];
-
         document.addEventListener('DOMContentLoaded', function() {
             fetch('http://localhost/flight-service/index.php?action=read_vuelos')
                 .then(response => response.json())
@@ -59,13 +57,6 @@
                         option.textContent = destino;
                         destinoSelect.appendChild(option);
                     });
-                });
-
-            // Cargar la información de los aviones
-            fetch('http://localhost/flight-service/index.php?action=read_aviones')
-                .then(response => response.json())
-                .then(data => {
-                    aviones = data;
                 });
         });
 
@@ -105,30 +96,33 @@
                     });
 
                     vuelosFiltrados.forEach(vuelo => {
-                        const avion = aviones.find(av => av.ID == vuelo.Avion_ID);
-                        const capacidad = avion ? avion.Capacidad : 0;
-
-                        fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo&vuelo_id=${vuelo.ID}`)
+                        fetch(`http://localhost/flight-service/index.php?action=read_avion&id=${vuelo.Avion_ID}`)
                             .then(response => response.json())
-                            .then(pasajeros => {
-                                const asientosOcupados = pasajeros.filter(p => p.Vuelo_ID == vuelo.ID).length;
-                                const asientosDisponibles = capacidad - asientosOcupados;
+                            .then(avion => {
+                                const capacidad = avion ? avion.Capacidad : 0;
 
-                                const row = table.insertRow();
-                                row.insertCell().textContent = vuelo.ID;
-                                row.insertCell().textContent = avion ? avion.Modelo : 'Desconocido';
-                                row.insertCell().textContent = vuelo.Fecha;
-                                row.insertCell().textContent = vuelo.Origen;
-                                row.insertCell().textContent = vuelo.Destino;
-                                row.insertCell().textContent = vuelo.Precio;
-                                row.insertCell().textContent = vuelo.Hora;
-                                row.insertCell().textContent = asientosDisponibles;
-                                row.insertCell().textContent = asientosDisponibles == 0 ? 'El vuelo está lleno' : 'Disponible';
-                                const actionCell = row.insertCell();
-                                const actionLink = document.createElement('a');
-                                actionLink.href = `seleccionar_asiento.html?vuelo_id=${vuelo.ID}`;
-                                actionLink.textContent = 'Seleccionar asiento';
-                                actionCell.appendChild(actionLink);
+                                fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo&vuelo_id=${vuelo.ID}`)
+                                    .then(response => response.json())
+                                    .then(pasajeros => {
+                                        const asientosOcupados = pasajeros.filter(p => p.Vuelo_ID == vuelo.ID).length;
+                                        const asientosDisponibles = capacidad - asientosOcupados;
+
+                                        const row = table.insertRow();
+                                        row.insertCell().textContent = vuelo.ID;
+                                        row.insertCell().textContent = avion ? avion.Modelo : 'Desconocido';
+                                        row.insertCell().textContent = vuelo.Fecha;
+                                        row.insertCell().textContent = vuelo.Origen;
+                                        row.insertCell().textContent = vuelo.Destino;
+                                        row.insertCell().textContent = vuelo.Precio;
+                                        row.insertCell().textContent = vuelo.Hora;
+                                        row.insertCell().textContent = asientosDisponibles;
+                                        row.insertCell().textContent = asientosDisponibles == 0 ? 'El vuelo está lleno' : 'Disponible';
+                                        const actionCell = row.insertCell();
+                                        const actionLink = document.createElement('a');
+                                        actionLink.href = `seleccionar_asiento.html?vuelo_id=${vuelo.ID}`;
+                                        actionLink.textContent = 'Seleccionar asiento';
+                                        actionCell.appendChild(actionLink);
+                                    });
                             });
                     });
 
