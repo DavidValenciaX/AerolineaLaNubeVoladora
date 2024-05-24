@@ -44,65 +44,125 @@
         const vuelo_id = urlParams.get('vuelo_id');
         document.getElementById('vuelo_id').value = vuelo_id;
 
-        fetch(`http://localhost/ticket-service/obtener_detalles_vuelo.php?vuelo_id=${vuelo_id}`)
+        // Obtener detalles del vuelo
+        fetch(`http://localhost/flight-service/index.php?action=read_vuelo&id=${vuelo_id}`)
             .then(response => response.json())
             .then(vuelo => {
                 const vueloDetalles = document.getElementById('vueloDetalles');
                 vueloDetalles.innerHTML = `
                     <h3>Vuelo ID: ${vuelo.ID}</h3>
-                    <h3>Avión: ${vuelo.Modelo}</h3>
+                    <h3>Avión: ${vuelo.Avion_ID}</h3>
                     <h3>Fecha: ${vuelo.Fecha}</h3>
                     <h3>Origen: ${vuelo.Origen}</h3>
                     <h3>Destino: ${vuelo.Destino}</h3>
                     <h3>Hora: ${vuelo.Hora}</h3>
                 `;
 
-                const asientosDiv = document.getElementById('asientos');
-                const table = document.createElement('table');
-                for (let i = 1; i <= vuelo.Columnas; i++) {
-                    const row = table.insertRow();
-                    for (let j = 1; j <= vuelo.Filas; j++) {
-                        const asiento = String.fromCharCode(64 + i) + j;
-                        const cell = row.insertCell();
-                        cell.className = vuelo.asientos_ocupados.includes(asiento) ? 'asiento-ocupado' : 'asiento-disponible';
-                        cell.innerHTML = `<label><input type="radio" name="asiento" value="${asiento}" ${vuelo.asientos_ocupados.includes(asiento) ? 'disabled' : ''}> ${asiento}</label>`;
-                    }
-                }
-                asientosDiv.appendChild(table);
+                // Obtener detalles del avión
+                fetch(`http://localhost/flight-service/index.php?action=read_aviones`)
+                    .then(response => response.json())
+                    .then(aviones => {
+                        const avion = aviones.find(a => a.ID == vuelo.Avion_ID);
+
+                        // Obtener asientos ocupados
+                        fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo_by_vuelo&vuelo_id=${vuelo_id}`)
+                            .then(response => response.json())
+                            .then(pasajeros => {
+                                const asientosOcupados = pasajeros.map(p => p.Asiento);
+
+                                // Mostrar asientos
+                                const asientosDiv = document.getElementById('asientos');
+                                const table = document.createElement('table');
+                                for (let i = 1; i <= avion.Filas; i++) {
+                                    const row = table.insertRow();
+                                    for (let j = 1; j <= avion.Columnas; j++) {
+                                        const asiento = String.fromCharCode(64 + j) + i;
+                                        const cell = row.insertCell();
+                                        cell.className = asientosOcupados.includes(asiento) ? 'asiento-ocupado' : 'asiento-disponible';
+                                        cell.innerHTML = `<label><input type="radio" name="asiento" value="${asiento}" ${asientosOcupados.includes(asiento) ? 'disabled' : ''}> ${asiento}</label>`;
+                                    }
+                                }
+                                asientosDiv.appendChild(table);
+                            });
+                    });
             });
 
+        // Procesar pago y reservar asiento
         document.getElementById('seleccionarAsientoForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const data = {
-                vuelo_id: document.getElementById('vuelo_id').value,
-                asiento: document.querySelector('input[name="asiento"]:checked').value,
-                nombre: document.getElementById('nombre').value,
-                apellidos: document.getElementById('apellidos').value,
+
+            const nombre = document.getElementById('nombre').value;
+            const apellidos = document.getElementById('apellidos').value;
+        
+            // Función para obtener las iniciales
+            function obtenerIniciales(nombre, apellidos) {
+                const inicialNombre = nombre ? nombre.charAt(0).toUpperCase() : '';
+                const inicialApellidos = apellidos ? apellidos.split(' ').map(palabra => palabra.charAt(0).toUpperCase()).join('') : '';
+                return inicialNombre + inicialApellidos;
+            }
+
+            const iniciales = obtenerIniciales(nombre, apellidos);
+
+            const pasajeroData = {
+                nombre: nombre,
+                apellidos: apellidos,
                 fecha_nac: document.getElementById('fecha_nac').value,
                 sexo: document.getElementById('sexo').value
             };
 
-            fetch('http://localhost/ticket-service/procesar_pago.php', {
+            // Crear nuevo pasajero
+            fetch('http://localhost/ticket-service/index.php?action=create_pasajero', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(pasajeroData)
             })
             .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    Swal.fire({
-                        title: 'Éxito',
-                        text: `Pago realizado y asiento reservado exitosamente. Su código de billete es: ${data.billete}`,
-                        icon: 'success'
-                    }).then(() => {
-                        window.location.href = `informacion_billete.html?billete=${data.billete}`;
+            .then(pasajeroResponse => {
+                if (pasajeroResponse.status === 'success') {
+                    const pasajero_id = pasajeroResponse.id;
+                    const vuelo_id = document.getElementById('vuelo_id').value;
+                    const asiento = document.querySelector('input[name="asiento"]:checked').value;
+                    const billete = `${vuelo_id}-${pasajero_id}-${iniciales}-${asiento}-${Date.now()}`;
+
+                    const pasajeroEnVueloData = {
+                        pasajero_id: pasajero_id,
+                        vuelo_id: vuelo_id,
+                        billete: billete,
+                        asiento: asiento
+                    };
+
+                    // Crear nuevo pasajero en vuelo
+                    fetch('http://localhost/ticket-service/index.php?action=create_pasajeroenvuelo', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(pasajeroEnVueloData)
+                    })
+                    .then(response => response.json())
+                    .then(pasajeroEnVueloResponse => {
+                        if (pasajeroEnVueloResponse.status === 'success') {
+                            Swal.fire({
+                                title: 'Éxito',
+                                text: `Pago realizado y asiento reservado exitosamente. Su código de billete es: ${billete}`,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.href = `informacion_billete.html?billete=${billete}`;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: pasajeroEnVueloResponse.message,
+                                icon: 'error'
+                            });
+                        }
                     });
                 } else {
                     Swal.fire({
                         title: 'Error',
-                        text: data.message,
+                        text: pasajeroResponse.message,
                         icon: 'error'
                     });
                 }
