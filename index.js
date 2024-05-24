@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         roleData.usuario_rol === "Superusuario"
           ? `
       <a href='register.html'>Registrar Usuarios</a>
-      <a href='administracion_roles/permission_table.html'>Ir a la tabla de permisos</a>
+      <a href='administracion_roles/permission_table.html'>Tabla de permisos</a>
       <a href='administracion_roles/asignar_roles.html'>Asignar roles a usuarios</a>
       `
           : ""
