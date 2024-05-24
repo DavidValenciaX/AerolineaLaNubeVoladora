@@ -25,8 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const baseUrl = window.location.origin + `/frontend`;
 
-    console.log({ baseUrl });
-
     if (permisosArray.includes("registrar vuelos")) {
       permisosHtml += `
               <a href='${baseUrl}/registrar_vuelos/agregar_avion.html'>Agregar Avión</a>
@@ -71,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         showConfirmButton: false,
         timer: 1000,
       });
-      window.location.href = "/login.html";
+      window.location.href = `${baseUrl}/login.html`;
     });
 
     const footer = document.getElementById("footer");
