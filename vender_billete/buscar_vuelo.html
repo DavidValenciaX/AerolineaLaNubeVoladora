@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 <body>
+    <nav id="navbar"></nav>
     <h2>Buscar Vuelo</h2>
     <form id="buscarVueloForm">
         <label for="fecha">Fecha:</label>
@@ -27,7 +28,8 @@
 
     <br>
     <a href="../index.html" class="button">Volver al Dashboard</a>
-
+    <footer id="footer"></footer>
+    <script src="../loadElements.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetch('http://localhost/flight-service/index.php?action=read_vuelos')

@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 <body>
-
+    <nav id="navbar"></nav>
     <h2>Agregar Avión</h2>
     <form id="agregarAvionForm">
         <label for="modelo">Modelo:</label>
@@ -23,7 +23,8 @@
     </form>
     <br>
     <a href="../index.html" class="button">Volver al Dashboard</a>
-
+    <footer id="footer"></footer>
+    <script src="../loadElements.js"></script>
     <script>
         document.getElementById('agregarAvionForm').addEventListener('submit', function(e) {
             e.preventDefault();

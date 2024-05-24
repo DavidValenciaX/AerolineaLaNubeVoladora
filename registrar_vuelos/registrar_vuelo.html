@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    
+    <nav id="navbar"></nav>
     <h2>Registrar Vuelo</h2>
     <form id="registrarVueloForm">
         <label for="avion_id">Avión:</label>
@@ -31,7 +31,8 @@
     </form>
     <br>
     <a href="../index.html" class="button">Volver al Dashboard</a>
-
+    <footer id="footer"></footer>
+    <script src="../loadElements.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetch('http://localhost/flight-service/index.php?action=read_aviones')

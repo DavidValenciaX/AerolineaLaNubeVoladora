@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 <body>
+    <nav id="navbar"></nav>
     <h2>Tabla de Permisos</h2>
     <form id="permissionsForm">
         <table id="permissionsTable">
@@ -16,6 +17,8 @@
         <input type="submit" value="Guardar permisos">
     </form>
     <p><a href="../index.html" class="button">Volver al dashboard</a></p>
+    <footer id="footer"></footer>
+    <script src="../loadElements.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Cargar roles y permisos

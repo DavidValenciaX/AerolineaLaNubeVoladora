@@ -14,6 +14,7 @@
     </style>
 </head>
 <body>
+    <nav id="navbar"></nav>
     <h2>Seleccionar Asiento</h2>
     <form id="seleccionarAsientoForm">
         <input type="hidden" id="vuelo_id" name="vuelo_id" value="">
@@ -38,7 +39,8 @@
     </form>
     <br>
     <a href="buscar_vuelo.html" class="button">Volver a Buscar Vuelo</a>
-
+    <footer id="footer"></footer>
+    <script src="../loadElements.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const vuelo_id = urlParams.get('vuelo_id');

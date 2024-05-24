@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+    <nav id="navbar"></nav>
     <h2>Buscar Billete</h2>
     <form id="buscarBilleteForm">
         <label for="billete">Número de Billete:</label>
@@ -19,7 +20,8 @@
 
     <br>
     <a href="../index.html" class="button">Volver al Dashboard</a>
-
+    <footer id="footer"></footer>
+    <script src="../loadElements.js"></script>
     <script>
         document.getElementById('buscarBilleteForm').addEventListener('submit', function(e) {
             e.preventDefault();
