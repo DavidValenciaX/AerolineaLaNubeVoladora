@@ -25,33 +25,62 @@
             e.preventDefault();
             const billete = document.getElementById('billete').value;
 
-            fetch(`http://localhost/ticket-service/buscar_billete.php?billete=${billete}`)
+            // Obtener la información del pasajero en vuelo utilizando el billete
+            fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo_by_billete&billete=${billete}`)
                 .then(response => response.json())
-                .then(data => {
-                    const resultDiv = document.getElementById('result');
-                    resultDiv.innerHTML = '';
-
-                    if (data.Billete) {
-                        resultDiv.innerHTML = `
-                            <div class='card'>
-                                <h1>Información del Billete</h1>
-                                <p><strong>Número de Billete:</strong> ${data.Billete}</p>
-                                <p><strong>Nombre:</strong> ${data.Nombre} ${data.Apellidos}</p>
-                                <p><strong>Fecha de viaje:</strong> ${data.Fecha}</p>
-                                <p><strong>Hora de viaje:</strong> ${data.Hora}</p>
-                                <p><strong>Origen:</strong> ${data.Origen}</p>
-                                <p><strong>Destino:</strong> ${data.Destino}</p>
-                                <p><strong>Avión:</strong> ${data.Modelo}</p>
-                                <p><strong>Asiento:</strong> ${data.Asiento}</p>
-                            </div>
-                        `;
-                    } else {
+                .then(pasajeroEnVuelo => {
+                    if (!pasajeroEnVuelo || !pasajeroEnVuelo.Vuelo_ID) {
                         Swal.fire({
                             title: 'Error',
                             text: 'No se encontró la información del billete.',
                             icon: 'error'
                         });
+                        return;
                     }
+
+                    const vuelo_id = pasajeroEnVuelo.Vuelo_ID;
+                    const pasajero_id = pasajeroEnVuelo.Pasajero_ID;
+
+                    // Obtener la información del vuelo
+                    fetch(`http://localhost/flight-service/index.php?action=read_vuelo&id=${vuelo_id}`)
+                        .then(response => response.json())
+                        .then(vuelo => {
+                            if (!vuelo || !vuelo.Avion_ID) {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'No se encontró la información del vuelo.',
+                                    icon: 'error'
+                                });
+                                return;
+                            }
+
+                            const avion_id = vuelo.Avion_ID;
+
+                            // Obtener la información del avión
+                            fetch(`http://localhost/flight-service/index.php?action=read_avion&id=${avion_id}`)
+                                .then(response => response.json())
+                                .then(avion => {
+                                    // Obtener la información del pasajero
+                                    fetch(`http://localhost/ticket-service/index.php?action=read_pasajero&id=${pasajero_id}`)
+                                        .then(response => response.json())
+                                        .then(pasajero => {
+                                            const resultDiv = document.getElementById('result');
+                                            resultDiv.innerHTML = `
+                                                <div class='card'>
+                                                    <h1>Información del Billete</h1>
+                                                    <p><strong>Número de Billete:</strong> ${pasajeroEnVuelo.Billete}</p>
+                                                    <p><strong>Nombre:</strong> ${pasajero.Nombre} ${pasajero.Apellidos}</p>
+                                                    <p><strong>Fecha de viaje:</strong> ${vuelo.Fecha}</p>
+                                                    <p><strong>Hora de viaje:</strong> ${vuelo.Hora}</p>
+                                                    <p><strong>Origen:</strong> ${vuelo.Origen}</p>
+                                                    <p><strong>Destino:</strong> ${vuelo.Destino}</p>
+                                                    <p><strong>Avión:</strong> ${avion.Modelo}</p>
+                                                    <p><strong>Asiento:</strong> ${pasajeroEnVuelo.Asiento}</p>
+                                                </div>
+                                            `;
+                                        });
+                                });
+                        });
                 });
         });
     </script>

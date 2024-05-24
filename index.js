@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       permisosHtml += `
         <a href='vender_billete/buscar_vuelo.html'>Buscar Vuelo</a>
         <a href='vender_billete/buscar_billete.html'>Buscar billete</a>
-        <a href='vender_billete/descargar_informacion_vuelo.html'>Descargar informacion de vuelo</a>
       `;
     }
 
