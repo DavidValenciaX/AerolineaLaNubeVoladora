@@ -29,26 +29,43 @@
     <a href="../index.html" class="button">Volver al Dashboard</a>
 
     <script>
+        let aviones = [];
+
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('http://localhost/ticket-service/obtener_origenes_destinos.php')
+            fetch('http://localhost/flight-service/index.php?action=read_vuelos')
                 .then(response => response.json())
                 .then(data => {
+                    const origenSet = new Set();
+                    const destinoSet = new Set();
+
+                    data.forEach(vuelo => {
+                        origenSet.add(vuelo.Origen);
+                        destinoSet.add(vuelo.Destino);
+                    });
+
                     const origenSelect = document.getElementById('origen');
                     const destinoSelect = document.getElementById('destino');
 
-                    data.origenes.forEach(origen => {
+                    origenSet.forEach(origen => {
                         const option = document.createElement('option');
                         option.value = origen;
                         option.textContent = origen;
                         origenSelect.appendChild(option);
                     });
 
-                    data.destinos.forEach(destino => {
+                    destinoSet.forEach(destino => {
                         const option = document.createElement('option');
                         option.value = destino;
                         option.textContent = destino;
                         destinoSelect.appendChild(option);
                     });
+                });
+
+            // Cargar la información de los aviones
+            fetch('http://localhost/flight-service/index.php?action=read_aviones')
+                .then(response => response.json())
+                .then(data => {
+                    aviones = data;
                 });
         });
 
@@ -60,19 +77,24 @@
                 destino: document.getElementById('destino').value
             };
 
-            fetch('http://localhost/ticket-service/buscar_vuelo.php', {
-                method: 'POST',
+            fetch('http://localhost/flight-service/index.php?action=read_vuelos', {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+                }
             })
             .then(response => response.json())
-            .then(data => {
+            .then(vuelos => {
                 const resultadosDiv = document.getElementById('resultados');
                 resultadosDiv.innerHTML = '';
 
-                if (data.length > 0) {
+                const vuelosFiltrados = vuelos.filter(vuelo =>
+                    (!data.fecha || vuelo.Fecha === data.fecha) &&
+                    (!data.origen || vuelo.Origen === data.origen) &&
+                    (!data.destino || vuelo.Destino === data.destino)
+                );
+
+                if (vuelosFiltrados.length > 0) {
                     const table = document.createElement('table');
                     table.border = '1';
 
@@ -82,22 +104,32 @@
                         cell.textContent = text;
                     });
 
-                    data.forEach(vuelo => {
-                        const row = table.insertRow();
-                        row.insertCell().textContent = vuelo.ID;
-                        row.insertCell().textContent = vuelo.Modelo;
-                        row.insertCell().textContent = vuelo.Fecha;
-                        row.insertCell().textContent = vuelo.Origen;
-                        row.insertCell().textContent = vuelo.Destino;
-                        row.insertCell().textContent = vuelo.Precio;
-                        row.insertCell().textContent = vuelo.Hora;
-                        row.insertCell().textContent = vuelo.asientos_disponibles;
-                        row.insertCell().textContent = vuelo.asientos_disponibles == 0 ? 'El vuelo está lleno' : 'Disponible';
-                        const actionCell = row.insertCell();
-                        const actionLink = document.createElement('a');
-                        actionLink.href = `seleccionar_asiento.html?vuelo_id=${vuelo.ID}`;
-                        actionLink.textContent = 'Seleccionar asiento';
-                        actionCell.appendChild(actionLink);
+                    vuelosFiltrados.forEach(vuelo => {
+                        const avion = aviones.find(av => av.ID == vuelo.Avion_ID);
+                        const capacidad = avion ? avion.Capacidad : 0;
+
+                        fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo&vuelo_id=${vuelo.ID}`)
+                            .then(response => response.json())
+                            .then(pasajeros => {
+                                const asientosOcupados = pasajeros.length;
+                                const asientosDisponibles = capacidad - asientosOcupados;
+
+                                const row = table.insertRow();
+                                row.insertCell().textContent = vuelo.ID;
+                                row.insertCell().textContent = avion ? avion.Modelo : 'Desconocido';
+                                row.insertCell().textContent = vuelo.Fecha;
+                                row.insertCell().textContent = vuelo.Origen;
+                                row.insertCell().textContent = vuelo.Destino;
+                                row.insertCell().textContent = vuelo.Precio;
+                                row.insertCell().textContent = vuelo.Hora;
+                                row.insertCell().textContent = asientosDisponibles;
+                                row.insertCell().textContent = asientosDisponibles == 0 ? 'El vuelo está lleno' : 'Disponible';
+                                const actionCell = row.insertCell();
+                                const actionLink = document.createElement('a');
+                                actionLink.href = `seleccionar_asiento.html?vuelo_id=${vuelo.ID}`;
+                                actionLink.textContent = 'Seleccionar asiento';
+                                actionCell.appendChild(actionLink);
+                            });
                     });
 
                     resultadosDiv.appendChild(table);
