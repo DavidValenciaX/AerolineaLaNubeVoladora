@@ -34,7 +34,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('http://localhost/flight-service/obtener_aviones.php')
+            fetch('http://localhost/flight-service/index.php?action=read_aviones')
             .then(response => response.json())
             .then(data => {
                 const avionSelect = document.getElementById('avion_id');
@@ -58,7 +58,7 @@
                 hora: document.getElementById('hora').value
             };
 
-            fetch('http://localhost/flight-service/registrar_vuelo.php', {
+            fetch('http://localhost/flight-service/index.php?action=create_vuelo', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
