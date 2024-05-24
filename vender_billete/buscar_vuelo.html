@@ -111,7 +111,7 @@
                         fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo&vuelo_id=${vuelo.ID}`)
                             .then(response => response.json())
                             .then(pasajeros => {
-                                const asientosOcupados = pasajeros.length;
+                                const asientosOcupados = pasajeros.filter(p => p.Vuelo_ID == vuelo.ID).length;
                                 const asientosDisponibles = capacidad - asientosOcupados;
 
                                 const row = table.insertRow();
