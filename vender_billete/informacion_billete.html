@@ -18,7 +18,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const billete = urlParams.get('billete');
 
-            fetch(`http://localhost/flight-service/obtener_informacion_billete.php?billete=${billete}`)
+            fetch(`http://localhost/ticket-service/obtener_informacion_billete.php?billete=${billete}`)
                 .then(response => response.json())
                 .then(data => {
                     const billeteInfoDiv = document.getElementById('billeteInfo');

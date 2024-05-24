@@ -30,7 +30,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('http://localhost/flight-service/obtener_origenes_destinos.php')
+            fetch('http://localhost/ticket-service/obtener_origenes_destinos.php')
                 .then(response => response.json())
                 .then(data => {
                     const origenSelect = document.getElementById('origen');
@@ -60,7 +60,7 @@
                 destino: document.getElementById('destino').value
             };
 
-            fetch('http://localhost/flight-service/buscar_vuelo.php', {
+            fetch('http://localhost/ticket-service/buscar_vuelo.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -95,7 +95,7 @@
                         row.insertCell().textContent = vuelo.asientos_disponibles == 0 ? 'El vuelo está lleno' : 'Disponible';
                         const actionCell = row.insertCell();
                         const actionLink = document.createElement('a');
-                        actionLink.href = `http://localhost/flight-service/descargar_csv.php?vuelo_id=${vuelo.ID}`;
+                        actionLink.href = `http://localhost/ticket-service/descargar_csv.php?vuelo_id=${vuelo.ID}`;
                         actionLink.textContent = 'Descargar información de vuelo';
                         actionCell.appendChild(actionLink);
                     });

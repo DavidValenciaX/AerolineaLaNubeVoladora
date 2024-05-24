@@ -44,7 +44,7 @@
         const vuelo_id = urlParams.get('vuelo_id');
         document.getElementById('vuelo_id').value = vuelo_id;
 
-        fetch(`http://localhost/flight-service/obtener_detalles_vuelo.php?vuelo_id=${vuelo_id}`)
+        fetch(`http://localhost/ticket-service/obtener_detalles_vuelo.php?vuelo_id=${vuelo_id}`)
             .then(response => response.json())
             .then(vuelo => {
                 const vueloDetalles = document.getElementById('vueloDetalles');
@@ -82,7 +82,7 @@
                 sexo: document.getElementById('sexo').value
             };
 
-            fetch('http://localhost/flight-service/procesar_pago.php', {
+            fetch('http://localhost/ticket-service/procesar_pago.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -5,12 +5,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       "http://localhost/user-service/get_user_info.php"
     );
     if (userInfoResponse.status === 401) {
-      await Swal.fire({
-        title: "Alerta",
-        text: "No has iniciado sesión. Redirigiendo al login...",
-        icon: "warning",
-        confirmButtonText: "Aceptar",
-      });
       window.location.href = "login.html";
       return;
     }

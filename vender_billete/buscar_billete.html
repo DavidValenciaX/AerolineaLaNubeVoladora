@@ -25,7 +25,7 @@
             e.preventDefault();
             const billete = document.getElementById('billete').value;
 
-            fetch(`http://localhost/flight-service/buscar_billete.php?billete=${billete}`)
+            fetch(`http://localhost/ticket-service/buscar_billete.php?billete=${billete}`)
                 .then(response => response.json())
                 .then(data => {
                     const resultDiv = document.getElementById('result');
