@@ -11,6 +11,7 @@
         .asiento-ocupado { background-color: lightcoral; }
         table { border-collapse: collapse; margin: 20px 0; font-size: 18px; text-align: left; }
         table th, table td { padding: 10px; border: 1px solid #ddd; }
+        #seleccionAsientoForm{ display: none;}
     </style>
 </head>
 <body>
@@ -42,6 +43,46 @@
     <footer id="footer"></footer>
     <script src="../loadElements.js"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                // Verificar si el usuario está logueado
+                const userInfoResponse = await fetch("http://localhost/user-service/get_user_info.php");
+                if (userInfoResponse.status === 401) {
+                    window.location.href = "/frontend/login.html";
+                    return;
+                }
+
+                const userData = await userInfoResponse.json();
+
+                // Fetch permisos info
+                const permissionsResponse = await fetch("http://localhost/user-service/get_permissions_by_user.php");
+                const permissionsData = await permissionsResponse.json();
+                const permisosArray = Object.values(permissionsData.permisos);
+
+                // Verificar si el usuario tiene permiso para comprar billete
+                if (!permisosArray.includes("comprar billete")) {
+                    Swal.fire({
+                        title: "Acceso denegado",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        window.location.href = "/frontend/index.html"; // Redirigir al dashboard o página de inicio
+                    });
+                } else {
+                    document.getElementById('seleccionarAsientoForm').style.display = 'block'; // Mostrar el formulario
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al procesar la información.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar"
+                });
+            }
+        });
+
         const urlParams = new URLSearchParams(window.location.search);
         const vuelo_id = urlParams.get('vuelo_id');
         document.getElementById('vuelo_id').value = vuelo_id;
