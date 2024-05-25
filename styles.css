@@ -125,7 +125,7 @@ footer {
   background-color: var(--odd-item-bg-color);
 }
 
-.carousel th:hover, .carousel td:hover {
+.carousel tr:hover th, .carousel tr:hover td {
   background-color: var(--highlight-color);
   color: white;
 }
