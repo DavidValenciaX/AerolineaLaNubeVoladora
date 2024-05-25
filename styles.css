@@ -7,8 +7,14 @@
 }
 
 :root {
-  --main-bg-color: #4161BF;
+  --main-bg-color: #4161bf;
   --main-bg-color-hover: #2f4faf;
+  --carousel-bg-color: #ffffff;
+  --item-bg-color: #f9f9f9;
+  --item-border-color: #ccc;
+  --text-color: #333;
+  --highlight-color: #4161bf;
+  --odd-item-bg-color: #e9e9e9;
 }
 
 html {
@@ -22,28 +28,24 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-
   min-height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
 nav {
   background-color: var(--main-bg-color);
   width: 100%;
-  padding: 15px 0;
-  margin-bottom: 20px;
+  padding: 0.9375rem 0;
+  margin-bottom: 1.25rem;
   display: flex;
   justify-content: center;
-  flex-wrap: nowrap;
 }
 
 nav a,
 nav button {
   color: white;
-  margin: 0 15px;
+  margin: 0 0.9375rem;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: bold;
   background: none;
   border: none;
@@ -55,169 +57,84 @@ nav button:hover {
   text-decoration: underline;
 }
 
-.card {
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
-}
-
-.card h1,
-.card p {
-  margin: 10px 0;
-}
-
 h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  color: #333;
+h2 {
+  color: var(--text-color);
   margin-top: 0;
 }
 
+h1,
 h2 {
-  font-size: 28px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-p {
-  font-size: 16px;
-  line-height: 1.5;
-  margin-bottom: 15px;
-}
-
-form {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-  min-width: 35%;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  font-size: 16px;
-  color: #555;
-}
-
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="number"],
-input[type="date"],
-input[type="time"],
-select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  margin-bottom: 20px;
-  font-size: 16px;
-}
-
-input[type="submit"] {
-  background-color: var(--main-bg-color);
-  color: white;
-  width: 100%;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 18px;
-  transition: background-color 0.3s ease;
-}
-
-input[type="submit"]:hover {
-  background-color: var(--main-bg-color-hover);
-}
-
-.cerrar_sesion,
-.seleccion_asiento {
-  max-width: min-content;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 30px;
-  margin: 0 auto 30px;
-}
-
-th,
-td {
-  padding: 12px;
-  text-align: left;
-  background-color: #ffffff;
-  font-size: 16px;
-}
-
-th {
-  background-color: #ffffff;
-  font-weight: bold;
-}
-
-a.button {
-  display: inline-block;
-  background-color: var(--main-bg-color);
-  color: white;
-  padding: 12px 24px;
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 18px;
-  transition: background-color 0.3s ease;
-  margin-right: 10px;
-  text-align: center;
-}
-
-a.button:hover {
-  background-color: var(--main-bg-color-hover);
-}
-
-.success {
-  color: #28a745;
-  font-size: 18px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.error {
-  color: #dc3545;
-  font-size: 18px;
-  margin-bottom: 20px;
+  margin: 1.25rem 0;
   text-align: center;
 }
 
 footer {
   background-color: var(--main-bg-color);
   width: 100%;
-  padding: 10px 0;
+  padding: 0.625rem 0;
   text-align: center;
   color: white;
-
   margin-top: auto;
 }
 
-#vueloDetalles{
+#content {
+  min-width: 75%;
+}
+
+#prox_vuelos {
+  color: var(--highlight-color);
+}
+
+.carousel {
+  width: 100%;
+  height: 50vh;
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+  background-color: var(--carousel-bg-color);
+  border-radius: 0.625rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+}
+
+.carousel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
+  animation: scroll 20s linear infinite;
+}
+
+.carousel table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.carousel th, .carousel td {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--item-border-color);
+  background-color: var(--item-bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease;
+}
+
+.carousel tr:nth-child(odd) th, .carousel tr:nth-child(odd) td {
+  background-color: var(--odd-item-bg-color);
+}
+
+.carousel th:hover, .carousel td:hover {
+  background-color: var(--highlight-color);
+  color: white;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
 }
