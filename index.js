@@ -21,6 +21,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const roleData = await roleResponse.json();
     document.getElementById("role").innerText = `Rol: ${roleData.usuario_rol}`;
 
+    // Fetch permisos info
+    const permissionsResponse = await fetch(
+      "http://localhost/user-service/get_permissions_by_user.php"
+    );
+    const permissionsData = await permissionsResponse.json();
+    const permisosArray = Object.values(permissionsData.permisos);
+
     // Fetch flight data
     const flightResponse = await fetch(
       "http://localhost/flight-service/index.php?action=read_vuelos"
@@ -48,7 +55,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Añadir evento click a la fila
       row.addEventListener("click", () => {
-        window.location.href = `comprar_billete/comprar_billete.html?vuelo_id=${flight.ID}`;
+        if (permisosArray.includes("comprar billete")) {
+          window.location.href = `comprar_billete/comprar_billete.html?vuelo_id=${flight.ID}`;
+        } else {
+          Swal.fire({
+            title: "Acceso denegado",
+            text: "No tienes permiso para comprar billetes.",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+          });
+        }
       });
 
       table.appendChild(row);
