@@ -121,8 +121,8 @@
                                         row.insertCell().textContent = asientosDisponibles == 0 ? 'El vuelo está lleno' : 'Disponible';
                                         const actionCell = row.insertCell();
                                         const actionLink = document.createElement('a');
-                                        actionLink.href = `seleccionar_asiento.html?vuelo_id=${vuelo.ID}`;
-                                        actionLink.textContent = 'Seleccionar asiento';
+                                        actionLink.href = `comprar_billete.html?vuelo_id=${vuelo.ID}`;
+                                        actionLink.textContent = 'Comprar billete';
                                         actionCell.appendChild(actionLink);
                                         
                                         const downloadLink = document.createElement('a');

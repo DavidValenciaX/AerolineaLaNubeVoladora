@@ -45,6 +45,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>${flight.Hora}</td>
         <td>$${parseFloat(flight.Precio).toLocaleString("es-ES")}</td>
       `;
+
+      // Añadir evento click a la fila
+      row.addEventListener("click", () => {
+        window.location.href = `vender_billete/comprar_billete.html?vuelo_id=${flight.ID}`;
+      });
+
       table.appendChild(row);
     });
 
