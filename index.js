@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Añadir evento click a la fila
       row.addEventListener("click", () => {
-        window.location.href = `vender_billete/comprar_billete.html?vuelo_id=${flight.ID}`;
+        window.location.href = `comprar_billete/comprar_billete.html?vuelo_id=${flight.ID}`;
       });
 
       table.appendChild(row);
