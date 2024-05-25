@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Añadir evento click a la fila
       row.addEventListener("click", () => {
-        if (permisosArray.includes("comprar billete")) {
+        if (permisosArray.includes("Comprar billete")) {
           window.location.href = `comprar_billete/comprar_billete.html?vuelo_id=${flight.ID}`;
         } else {
           Swal.fire({

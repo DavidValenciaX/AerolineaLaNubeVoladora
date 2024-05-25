@@ -8,11 +8,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const roleResponse = await fetch(
-      "http://localhost/user-service/get_info_rol.php"
-    );
-    const roleData = await roleResponse.json();
-
     const permissionsResponse = await fetch(
       "http://localhost/user-service/get_permissions_by_user.php"
     );
@@ -25,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const baseUrl = window.location.origin + `/frontend`;
 
-    if (permisosArray.includes("registrar usuarios")) {
+    if (permisosArray.includes("Registrar usuarios")) {
       permisosHtml += `
               <a href='${baseUrl}/register.html'>Registrar Usuarios</a>
           `;
@@ -43,14 +38,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           `;
     }
 
-    if (permisosArray.includes("registrar vuelos")) {
+    if (permisosArray.includes("Registrar vuelos")) {
       permisosHtml += `
               <a href='${baseUrl}/registrar_vuelos/agregar_avion.html'>Agregar Avión</a>
               <a href='${baseUrl}/registrar_vuelos/registrar_vuelo.html'>Registrar Vuelo</a>
           `;
     }
 
-    if (permisosArray.includes("comprar billete")) {
+    if (permisosArray.includes("Comprar billete")) {
       permisosHtml += `
               <a href='${baseUrl}/comprar_billete/buscar_vuelo.html'>Buscar Vuelo</a>
               <a href='${baseUrl}/comprar_billete/buscar_billete.html'>Buscar billete</a>
