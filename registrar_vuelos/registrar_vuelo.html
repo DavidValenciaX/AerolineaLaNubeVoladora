@@ -7,6 +7,11 @@
     <title>Registrar Vuelo</title>
     <link rel="stylesheet" type="text/css" href="../styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <style>
+        #registrarVueloForm {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -34,18 +39,57 @@
     <footer id="footer"></footer>
     <script src="../loadElements.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('http://localhost/flight-service/index.php?action=read_aviones')
-            .then(response => response.json())
-            .then(data => {
-                const avionSelect = document.getElementById('avion_id');
-                data.forEach(avion => {
-                    const option = document.createElement('option');
-                    option.value = avion.ID;
-                    option.textContent = avion.Modelo;
-                    avionSelect.appendChild(option);
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Verificar si el usuario está logueado
+                const userInfoResponse = await fetch("http://localhost/user-service/get_user_info.php");
+                if (userInfoResponse.status === 401) {
+                    window.location.href = "/frontend/login.html";
+                    return;
+                }
+
+                const userData = await userInfoResponse.json();
+
+                // Fetch permisos info
+                const permissionsResponse = await fetch("http://localhost/user-service/get_permissions_by_user.php");
+                const permissionsData = await permissionsResponse.json();
+                const permisosArray = Object.values(permissionsData.permisos);
+
+                // Verificar si el usuario tiene permiso para registrar vuelos
+                if (!permisosArray.includes("Registrar vuelos")) {
+                    Swal.fire({
+                        title: "Acceso denegado",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        window.location.href = "/frontend/index.html"; // Redirigir al dashboard o página de inicio
+                    });
+                } else {
+                    document.getElementById('registrarVueloForm').style.display = 'block';
+
+                    // Fetch aviones info
+                    fetch('http://localhost/flight-service/index.php?action=read_aviones')
+                    .then(response => response.json())
+                    .then(data => {
+                        const avionSelect = document.getElementById('avion_id');
+                        data.forEach(avion => {
+                            const option = document.createElement('option');
+                            option.value = avion.ID;
+                            option.textContent = avion.Modelo;
+                            avionSelect.appendChild(option);
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al procesar la información.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar"
                 });
-            });
+            }
         });
 
         document.getElementById('registrarVueloForm').addEventListener('submit', function(e) {
