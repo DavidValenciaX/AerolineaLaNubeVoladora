@@ -7,6 +7,11 @@
     <title>Asignar Roles a Usuarios</title>
     <link rel="stylesheet" type="text/css" href="../styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <style>
+        #rolesForm {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -22,74 +27,112 @@
         </table>
         <input type="submit" value="Guardar Roles">
     </form>
-    
+
     <footer id="footer"></footer>
 
     <script src="../loadElements.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Obtener los usuarios
-            fetch('http://localhost/user-service/get_users.php')
-                .then(response => response.json())
-                .then(data => {
-                    const usuarios = data.usuarios;
-                    fetchRoles(usuarios);
-                })
-                .catch(error => console.error('Error:', error));
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                // Verificar si el usuario está logueado
+                const userInfoResponse = await fetch("http://localhost/user-service/get_user_info.php");
+                if (userInfoResponse.status === 401) {
+                    window.location.href = "/frontend/login.html";
+                    return;
+                }
 
-            function fetchRoles(usuarios) {
-                fetch('http://localhost/user-service/get_roles.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        const roles = data.roles;
-                        renderTable(usuarios, roles);
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
+                const userData = await userInfoResponse.json();
 
-            function renderTable(usuarios, roles) {
-                const rolesTable = document.getElementById('rolesTable');
-                
-                usuarios.forEach(usuario => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${usuario.nombre} ${usuario.apellido} (${usuario.email})</td>
-                        <td>${usuario.rol}</td>
-                        <td>
-                            <select name="user_roles[${usuario.ID}]">
-                                ${roles.map(rol => `
-                                    <option value="${rol.ID}" ${usuario.rol === rol.nombre ? 'selected' : ''}>
-                                        ${rol.nombre}
-                                    </option>
-                                `).join('')}
-                            </select>
-                        </td>
-                    `;
-                    rolesTable.appendChild(row);
+                // Fetch permisos info
+                const permissionsResponse = await fetch("http://localhost/user-service/get_permissions_by_user.php");
+                const permissionsData = await permissionsResponse.json();
+                const permisosArray = Object.values(permissionsData.permisos);
+
+                // Verificar si el usuario tiene permiso para asignar roles
+                if (!permisosArray.includes("Asignar roles")) {
+                    Swal.fire({
+                        title: "Acceso denegado",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        window.location.href = "/frontend/index.html"; // Redirigir al dashboard o página de inicio
+                    });
+                } else {
+                    document.getElementById('rolesForm').style.display = 'block';
+
+                    // Obtener los usuarios y sus roles
+                    fetch('http://localhost/user-service/get_users.php')
+                        .then(response => response.json())
+                        .then(data => {
+                            const usuarios = data.usuarios;
+                            fetchRoles(usuarios);
+                        })
+                        .catch(error => console.error('Error:', error));
+
+                    function fetchRoles(usuarios) {
+                        fetch('http://localhost/user-service/get_roles.php')
+                            .then(response => response.json())
+                            .then(data => {
+                                const roles = data.roles;
+                                renderTable(usuarios, roles);
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
+
+                    function renderTable(usuarios, roles) {
+                        const rolesTable = document.getElementById('rolesTable');
+
+                        usuarios.forEach(usuario => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${usuario.nombre} ${usuario.apellido} (${usuario.email})</td>
+                                <td>${usuario.rol}</td>
+                                <td>
+                                    <select name="user_roles[${usuario.ID}]">
+                                        ${roles.map(rol => `
+                                            <option value="${rol.ID}" ${usuario.rol === rol.nombre ? 'selected' : ''}>
+                                                ${rol.nombre}
+                                            </option>
+                                        `).join('')}
+                                    </select>
+                                </td>
+                            `;
+                            rolesTable.appendChild(row);
+                        });
+                    }
+
+                    // Manejar el envío del formulario
+                    document.getElementById('rolesForm').addEventListener('submit', function (e) {
+                        e.preventDefault();
+
+                        const formData = new FormData(this);
+                        const params = new URLSearchParams(formData);
+
+                        fetch('http://localhost/user-service/update_roles.php', {
+                            method: 'POST',
+                            body: params,
+                        })
+                            .then(response => response.json())
+                            .then(response => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    text: response.message,
+                                });
+                            })
+                            .catch(error => console.error('Error:', error));
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al procesar la información.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar"
                 });
             }
-
-            // Manejar el envío del formulario
-            document.getElementById('rolesForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                
-                const formData = new FormData(this);
-                const params = new URLSearchParams(formData);
-
-                fetch('http://localhost/user-service/update_roles.php', {
-                    method: 'POST',
-                    body: params,
-                })
-                .then(response => response.json())
-                .then(response => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: response.message,
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-            });
         });
     </script>
 </body>
