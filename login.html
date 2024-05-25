@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,6 +12,7 @@
         }
     </style>
 </head>
+
 <body>
     <h2>Login</h2>
     <p id="error-message"></p>
@@ -18,9 +20,39 @@
         <label>Usuario:</label>
         <input type="text" name="usuario" required placeholder="Ingrese su usuario" title="Campo de usuario"><br>
         <label>Contraseña:</label>
-        <input type="password" name="contrasena" required placeholder="Ingrese su contraseña" title="Campo de contraseña"><br>
+        <input type="password" name="contrasena" required placeholder="Ingrese su contraseña"
+            title="Campo de contraseña"><br>
         <input type="submit" value="Iniciar sesión">
     </form>
-    <script src="login.js" defer></script>
+    <script>
+        document
+            .getElementById("login-form")
+            .addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                fetch("http://localhost/user-service/login.php", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        Accept: "application/json",
+                    },
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            window.location.href = "/frontend/index.html";
+                        } else {
+                            document.getElementById("error-message").textContent = data.message;
+                        }
+                    })
+                    .catch((error) => {
+                        document.getElementById("error-message").textContent =
+                            "Error en la solicitud. Intente de nuevo.";
+                    });
+            });
+
+    </script>
 </body>
+
 </html>
