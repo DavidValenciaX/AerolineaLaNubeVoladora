@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registro</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="register.js" defer></script>
+    <style>
+        #registerForm {
+            display: none;
+        }
+    </style>
 </head>
-
 <body>
     <nav id="navbar"></nav>
     <h2>Registrar usuario</h2>
@@ -30,6 +32,103 @@
     </form>
     <footer id="footer"></footer>
     <script src="loadElements.js"></script>
-</body>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Verificar si el usuario está logueado
+                const userInfoResponse = await fetch("http://localhost/user-service/get_user_info.php");
+                if (userInfoResponse.status === 401) {
+                    window.location.href = "/frontend/login.html";
+                    return;
+                }
 
+                const userData = await userInfoResponse.json();
+
+                // Fetch permisos info
+                const permissionsResponse = await fetch("http://localhost/user-service/get_permissions_by_user.php");
+                const permissionsData = await permissionsResponse.json();
+                const permisosArray = Object.values(permissionsData.permisos);
+
+                // Verificar si el usuario tiene permiso para registrar usuarios
+                if (!permisosArray.includes("Registrar usuarios")) {
+                    Swal.fire({
+                        title: "Acceso denegado",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        window.location.href = "/frontend/index.html"; // Redirigir al dashboard o página de inicio
+                    });
+                } else {
+                    document.getElementById('registerForm').style.display = 'block'; // Mostrar el formulario de registro
+
+                    // Cargar roles
+                    fetch("http://localhost/user-service/get_roles.php")
+                        .then((response) => response.json())
+                        .then((data) => {
+                            const roles = data.roles;
+                            const rolSelect = document.getElementById("rol");
+                            roles.forEach((rol) => {
+                                const option = document.createElement("option");
+                                option.value = rol.ID;
+                                option.textContent = rol.nombre;
+                                rolSelect.appendChild(option);
+                            });
+                        })
+                        .catch((error) => console.error("Error:", error));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al procesar la información.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar"
+                });
+            }
+        });
+
+        document.getElementById("registerForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const formData = {
+                nombre: document.getElementsByName("nombre")[0].value,
+                apellido: document.getElementsByName("apellido")[0].value,
+                email: document.getElementsByName("email")[0].value,
+                usuario: document.getElementsByName("usuario")[0].value,
+                contrasena: document.getElementsByName("contrasena")[0].value,
+                rol: document.getElementsByName("rol")[0].value,
+            };
+
+            fetch("http://localhost/user-service/register.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    Swal.fire({
+                        title: "¡Registro exitoso!",
+                        text: "El usuario ha sido registrado exitosamente.",
+                        icon: "success",
+                        confirmButtonText: "Aceptar",
+                    }).then(() => {
+                        window.location.href = "login.html";
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Error al registrar: " + data.message,
+                        icon: "error",
+                        confirmButtonText: "Aceptar",
+                    });
+                }
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+    </script>
+</body>
 </html>
