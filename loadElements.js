@@ -25,6 +25,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const baseUrl = window.location.origin + `/frontend`;
 
+    if (permisosArray.includes("registrar usuarios")) {
+      permisosHtml += `
+              <a href='${baseUrl}/register.html'>Registrar Usuarios</a>
+          `;
+    }
+
+    if (permisosArray.includes("Asignar permisos")) {
+      permisosHtml += `
+              <a href='${baseUrl}/administracion_roles/permission_table.html'>Asignar permisos</a>
+          `;
+    }
+
+    if (permisosArray.includes("Asignar roles")) {
+      permisosHtml += `
+              <a href='${baseUrl}/administracion_roles/asignar_roles.html'>Asignar roles</a>
+          `;
+    }
+
     if (permisosArray.includes("registrar vuelos")) {
       permisosHtml += `
               <a href='${baseUrl}/registrar_vuelos/agregar_avion.html'>Agregar Avión</a>
@@ -41,15 +59,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     navbar.innerHTML = `
           <a href='${baseUrl}/index.html'>Dashboard</a>
-          ${
-            roleData.usuario_rol === "Superusuario"
-              ? `
-          <a href='${baseUrl}/register.html'>Registrar Usuarios</a>
-          <a href='${baseUrl}/administracion_roles/permission_table.html'>Tabla de permisos</a>
-          <a href='${baseUrl}/administracion_roles/asignar_roles.html'>Asignar roles a usuarios</a>
-          `
-              : ""
-          }
           ${permisosHtml}
           <button id='logoutBtn'>Cerrar Sesión</button>
       `;
