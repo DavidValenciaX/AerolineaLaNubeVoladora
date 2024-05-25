@@ -6,6 +6,11 @@
     <title>Tabla de Permisos</title>
     <link rel="stylesheet" type="text/css" href="../styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <style>
+        #permissionsForm {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <nav id="navbar"></nav>
@@ -20,29 +25,67 @@
     <footer id="footer"></footer>
     <script src="../loadElements.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Cargar roles y permisos
-            fetch('http://localhost/user-service/get_permissions_by_role.php')
-                .then(response => response.json())
-                .then(data => {
-                    let table = document.getElementById('permissionsTable');
-                    let header = '<tr><th>Rol</th>';
-                    data.permisos.forEach(function (permiso) {
-                        header += '<th>' + permiso.nombre + '</th>';
-                    });
-                    header += '</tr>';
-                    table.innerHTML += header;
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                // Verificar si el usuario está logueado
+                const userInfoResponse = await fetch("http://localhost/user-service/get_user_info.php");
+                if (userInfoResponse.status === 401) {
+                    window.location.href = "/frontend/login.html";
+                    return;
+                }
 
-                    data.roles.forEach(function (rol) {
-                        let row = '<tr><td>' + rol.nombre + '</td>';
-                        data.permisos.forEach(function (permiso) {
-                            let checked = rol.permisos.includes(permiso.ID) ? 'checked' : '';
-                            row += `<td><input type='checkbox' name='permisos[${rol.ID}][]' value='${permiso.ID}' ${checked}></td>`;
-                        });
-                        row += '</tr>';
-                        table.innerHTML += row;
+                const userData = await userInfoResponse.json();
+
+                // Fetch permisos info
+                const permissionsResponse = await fetch("http://localhost/user-service/get_permissions_by_user.php");
+                const permissionsData = await permissionsResponse.json();
+                const permisosArray = Object.values(permissionsData.permisos);
+
+                // Verificar si el usuario tiene permiso para asignar permisos
+                if (!permisosArray.includes("Asignar permisos")) {
+                    Swal.fire({
+                        title: "Acceso denegado",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        window.location.href = "/frontend/index.html"; // Redirigir al dashboard o página de inicio
                     });
+                } else {
+                    document.getElementById('permissionsForm').style.display = 'block';
+
+                    // Cargar roles y permisos
+                    fetch('http://localhost/user-service/get_permissions_by_role.php')
+                        .then(response => response.json())
+                        .then(data => {
+                            let table = document.getElementById('permissionsTable');
+                            let header = '<tr><th>Rol</th>';
+                            data.permisos.forEach(function (permiso) {
+                                header += '<th>' + permiso.nombre + '</th>';
+                            });
+                            header += '</tr>';
+                            table.innerHTML += header;
+
+                            data.roles.forEach(function (rol) {
+                                let row = '<tr><td>' + rol.nombre + '</td>';
+                                data.permisos.forEach(function (permiso) {
+                                    let checked = rol.permisos.includes(permiso.ID) ? 'checked' : '';
+                                    row += `<td><input type='checkbox' name='permisos[${rol.ID}][]' value='${permiso.ID}' ${checked}></td>`;
+                                });
+                                row += '</tr>';
+                                table.innerHTML += row;
+                            });
+                        });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al procesar la información.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar"
                 });
+            }
 
             // Enviar formulario
             document.getElementById('permissionsForm').addEventListener('submit', function (event) {
@@ -51,16 +94,15 @@
                     method: 'POST',
                     body: new FormData(this)
                 })
-                    .then(response => response.text())
-                    .then(data => {
-                        Swal.fire('Éxito', data, 'success');
-                    })
-                    .catch(error => {
-                        Swal.fire('Error', 'Hubo un problema al guardar los permisos.', 'error');
-                    });
+                .then(response => response.text())
+                .then(data => {
+                    Swal.fire('Éxito', data, 'success');
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Hubo un problema al guardar los permisos.', 'error');
+                });
             });
         });
     </script>
 </body>
-</html>
 </html>
