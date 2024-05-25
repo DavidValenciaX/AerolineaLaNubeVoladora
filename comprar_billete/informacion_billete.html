@@ -6,6 +6,11 @@
     <title>Información del Billete</title>
     <link rel="stylesheet" type="text/css" href="../styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        #billeteInfo {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <nav id="navbar"></nav>
@@ -16,36 +21,44 @@
     <footer id="footer"></footer>
     <script src="../loadElements.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const billete = urlParams.get('billete');
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Verificar si el usuario está logueado
+                const userInfoResponse = await fetch("http://localhost/user-service/get_user_info.php");
+                if (userInfoResponse.status === 401) {
+                    window.location.href = "/frontend/login.html";
+                    return;
+                }
 
-            // Obtener la información del pasajero en vuelo utilizando el billete
-            fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo_by_billete&billete=${billete}`)
-                .then(response => response.json())
-                .then(pasajeroEnVuelo => {
-                    if (!pasajeroEnVuelo || !pasajeroEnVuelo.Vuelo_ID) {
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'No se encontró la información del billete.',
-                            icon: 'error'
-                        }).then(() => {
-                            window.location.href = '../index.html';
-                        });
-                        return;
-                    }
+                const userData = await userInfoResponse.json();
 
-                    const vuelo_id = pasajeroEnVuelo.Vuelo_ID;
-                    const pasajero_id = pasajeroEnVuelo.Pasajero_ID;
+                // Fetch permisos info
+                const permissionsResponse = await fetch("http://localhost/user-service/get_permissions_by_user.php");
+                const permissionsData = await permissionsResponse.json();
+                const permisosArray = Object.values(permissionsData.permisos);
 
-                    // Obtener la información del vuelo
-                    fetch(`http://localhost/flight-service/index.php?action=read_vuelo&id=${vuelo_id}`)
+                // Verificar si el usuario tiene permiso para comprar billete
+                if (!permisosArray.includes("Comprar billete")) {
+                    Swal.fire({
+                        title: "Acceso denegado",
+                        text: "No tienes permiso para acceder a esta página.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        window.location.href = "/frontend/index.html"; // Redirigir al dashboard o página de inicio
+                    });
+                } else {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const billete = urlParams.get('billete');
+
+                    // Obtener la información del pasajero en vuelo utilizando el billete
+                    fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo_by_billete&billete=${billete}`)
                         .then(response => response.json())
-                        .then(vuelo => {
-                            if (!vuelo || !vuelo.Avion_ID) {
+                        .then(pasajeroEnVuelo => {
+                            if (!pasajeroEnVuelo || !pasajeroEnVuelo.Vuelo_ID) {
                                 Swal.fire({
                                     title: 'Error',
-                                    text: 'No se encontró la información del vuelo.',
+                                    text: 'No se encontró la información del billete.',
                                     icon: 'error'
                                 }).then(() => {
                                     window.location.href = '../index.html';
@@ -53,33 +66,62 @@
                                 return;
                             }
 
-                            const avion_id = vuelo.Avion_ID;
+                            const vuelo_id = pasajeroEnVuelo.Vuelo_ID;
+                            const pasajero_id = pasajeroEnVuelo.Pasajero_ID;
 
-                            // Obtener la información del avión
-                            fetch(`http://localhost/flight-service/index.php?action=read_avion&id=${avion_id}`)
+                            // Obtener la información del vuelo
+                            fetch(`http://localhost/flight-service/index.php?action=read_vuelo&id=${vuelo_id}`)
                                 .then(response => response.json())
-                                .then(avion => {
-                                    // Obtener la información del pasajero
-                                    fetch(`http://localhost/ticket-service/index.php?action=read_pasajero&id=${pasajero_id}`)
+                                .then(vuelo => {
+                                    if (!vuelo || !vuelo.Avion_ID) {
+                                        Swal.fire({
+                                            title: 'Error',
+                                            text: 'No se encontró la información del vuelo.',
+                                            icon: 'error'
+                                        }).then(() => {
+                                            window.location.href = '../index.html';
+                                        });
+                                        return;
+                                    }
+
+                                    const avion_id = vuelo.Avion_ID;
+
+                                    // Obtener la información del avión
+                                    fetch(`http://localhost/flight-service/index.php?action=read_avion&id=${avion_id}`)
                                         .then(response => response.json())
-                                        .then(pasajero => {
-                                            const billeteInfoDiv = document.getElementById('billeteInfo');
-                                            billeteInfoDiv.innerHTML = `
-                                                <div class='card'>
-                                                    <p><strong>Número de Billete:</strong> ${pasajeroEnVuelo.Billete}</p>
-                                                    <p><strong>Nombre:</strong> ${pasajero.Nombre} ${pasajero.Apellidos}</p>
-                                                    <p><strong>Fecha de viaje:</strong> ${vuelo.Fecha}</p>
-                                                    <p><strong>Hora de viaje:</strong> ${vuelo.Hora}</p>
-                                                    <p><strong>Origen:</strong> ${vuelo.Origen}</p>
-                                                    <p><strong>Destino:</strong> ${vuelo.Destino}</p>
-                                                    <p><strong>Avión:</strong> ${avion.Modelo}</p>
-                                                    <p><strong>Asiento:</strong> ${pasajeroEnVuelo.Asiento}</p>
-                                                </div>
-                                            `;
+                                        .then(avion => {
+                                            // Obtener la información del pasajero
+                                            fetch(`http://localhost/ticket-service/index.php?action=read_pasajero&id=${pasajero_id}`)
+                                                .then(response => response.json())
+                                                .then(pasajero => {
+                                                    const billeteInfoDiv = document.getElementById('billeteInfo');
+                                                    billeteInfoDiv.innerHTML = `
+                                                        <div class='card'>
+                                                            <p><strong>Número de Billete:</strong> ${pasajeroEnVuelo.Billete}</p>
+                                                            <p><strong>Nombre:</strong> ${pasajero.Nombre} ${pasajero.Apellidos}</p>
+                                                            <p><strong>Fecha de viaje:</strong> ${vuelo.Fecha}</p>
+                                                            <p><strong>Hora de viaje:</strong> ${vuelo.Hora}</p>
+                                                            <p><strong>Origen:</strong> ${vuelo.Origen}</p>
+                                                            <p><strong>Destino:</strong> ${vuelo.Destino}</p>
+                                                            <p><strong>Avión:</strong> ${avion.Modelo}</p>
+                                                            <p><strong>Asiento:</strong> ${pasajeroEnVuelo.Asiento}</p>
+                                                        </div>
+                                                    `;
+                                                    document.getElementById('billeteInfo').style.display = 'block';
+                                                });
                                         });
                                 });
                         });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al procesar la información.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar"
                 });
+            }
         });
     </script>
 </body>

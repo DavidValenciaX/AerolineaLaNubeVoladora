@@ -146,6 +146,19 @@
 
             const iniciales = obtenerIniciales(nombre, apellidos);
 
+            const asientoSeleccionado = document.querySelector('input[name="asiento"]:checked');
+            if (!asientoSeleccionado) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Por favor, seleccione un asiento antes de proceder con el pago.',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+                return; // Detener el proceso si no se ha seleccionado un asiento
+            }
+
+            const asiento = asientoSeleccionado.value;
+
             const pasajeroData = {
                 nombre: nombre,
                 apellidos: apellidos,
@@ -166,7 +179,6 @@
                 if (pasajeroResponse.status === 'success') {
                     const pasajero_id = pasajeroResponse.id;
                     const vuelo_id = document.getElementById('vuelo_id').value;
-                    const asiento = document.querySelector('input[name="asiento"]:checked').value;
                     const billete = `${vuelo_id}-${pasajero_id}-${iniciales}-${asiento}-${Date.now()}`;
 
                     const pasajeroEnVueloData = {
