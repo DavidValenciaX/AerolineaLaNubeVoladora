@@ -20,12 +20,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const baseUrl = window.location.origin + `/frontend`;
 
-    if (permisosArray.includes("Registrar usuarios")) {
-      permisosHtml += `
-              <a href='${baseUrl}/register.html'>Registrar Usuarios</a>
-          `;
-    }
-
     if (permisosArray.includes("Asignar permisos")) {
       permisosHtml += `
               <a href='${baseUrl}/administracion_roles/permission_table.html'>Asignar permisos</a>
