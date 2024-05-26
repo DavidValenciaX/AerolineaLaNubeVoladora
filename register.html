@@ -32,11 +32,10 @@
         <input type="submit" value="Registrar usuario">
     </form>
     <script>
-
-        // Cargar roles
-        fetch("http://localhost/user-service/get_roles.php")
-            .then((response) => response.json())
-            .then((data) => {
+        async function loadRoles() {
+            try {
+                const response = await fetch("http://localhost/user-service/get_roles.php");
+                const data = await response.json();
                 const roles = data.roles;
                 const rolSelect = document.getElementById("rol");
                 roles.forEach((rol) => {
@@ -45,10 +44,14 @@
                     option.textContent = rol.nombre;
                     rolSelect.appendChild(option);
                 });
-            })
-            .catch((error) => console.error("Error:", error));
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
 
-        document.getElementById("registerForm").addEventListener("submit", function (event) {
+        document.addEventListener("DOMContentLoaded", loadRoles);
+
+        document.getElementById("registerForm").addEventListener("submit", async function (event) {
             event.preventDefault();
 
             const formData = {
@@ -60,34 +63,37 @@
                 rol: document.getElementsByName("rol")[0].value,
             };
 
-            fetch("http://localhost/user-service/register.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: "¡Registro exitoso!",
-                            text: "El usuario ha sido registrado exitosamente.",
-                            icon: "success",
-                            confirmButtonText: "Aceptar",
-                        }).then(() => {
-                            window.location.href = "login.html";
-                        });
-                    } else {
-                        Swal.fire({
-                            title: "Error",
-                            text: "Error al registrar: " + data.message,
-                            icon: "error",
-                            confirmButtonText: "Aceptar",
-                        });
-                    }
-                })
-                .catch((error) => console.error("Error:", error));
+            try {
+                const response = await fetch("http://localhost/user-service/register.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        title: "¡Registro exitoso!",
+                        text: "El usuario ha sido registrado exitosamente.",
+                        icon: "success",
+                        confirmButtonText: "Aceptar",
+                    }).then(() => {
+                        window.location.href = "login.html";
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Error al registrar: " + data.message,
+                        icon: "error",
+                        confirmButtonText: "Aceptar",
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
         });
     </script>
 </body>
