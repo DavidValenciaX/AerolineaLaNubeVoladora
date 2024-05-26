@@ -107,6 +107,16 @@ form {
   min-width: 35%;
 }
 
+.login-container, .register-container{
+  margin:0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width:100%;
+}
+
 label {
   display: block;
   margin-bottom: 0.5rem;
