@@ -26,33 +26,34 @@
         <label>Contraseña:</label>
         <input type="password" name="contrasena" required title="Contraseña" placeholder="Ingrese su contraseña"
             autocomplete="new-password"><br>
-        <label>Rol:</label>
-        <select name="rol" id="rol" required title="Rol" placeholder="Seleccione un rol"
-            autocomplete="off"></select><br>
         <input type="submit" value="Registrar usuario">
     </form>
     <script>
-        async function loadRoles() {
+        async function getClienteRoleId() {
             try {
                 const response = await fetch("http://localhost/user-service/get_roles.php");
                 const data = await response.json();
-                const roles = data.roles;
-                const rolSelect = document.getElementById("rol");
-                roles.forEach((rol) => {
-                    const option = document.createElement("option");
-                    option.value = rol.ID;
-                    option.textContent = rol.nombre;
-                    rolSelect.appendChild(option);
-                });
+                const clienteRole = data.roles.find(rol => rol.nombre === "Cliente");
+                return clienteRole ? clienteRole.ID : null;
             } catch (error) {
                 console.error("Error:", error);
+                return null;
             }
         }
 
-        document.addEventListener("DOMContentLoaded", loadRoles);
-
         document.getElementById("registerForm").addEventListener("submit", async function (event) {
             event.preventDefault();
+
+            const clienteRoleId = await getClienteRoleId();
+            if (!clienteRoleId) {
+                Swal.fire({
+                    title: "Error",
+                    text: "No se pudo encontrar el rol 'Cliente'.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar",
+                });
+                return;
+            }
 
             const formData = {
                 nombre: document.getElementsByName("nombre")[0].value,
@@ -60,7 +61,7 @@
                 email: document.getElementsByName("email")[0].value,
                 usuario: document.getElementsByName("usuario")[0].value,
                 contrasena: document.getElementsByName("contrasena")[0].value,
-                rol: document.getElementsByName("rol")[0].value,
+                rol: clienteRoleId,
             };
 
             try {
