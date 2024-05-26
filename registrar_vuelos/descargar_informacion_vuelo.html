@@ -163,26 +163,78 @@
                                         row.insertCell().textContent = vuelo.Hora;
                                         row.insertCell().textContent = asientosDisponibles;
                                         row.insertCell().textContent = asientosDisponibles == 0 ? 'El vuelo está lleno' : 'Disponible';
-                                        const actionCell = row.insertCell();
-                                        const actionLink = document.createElement('a');
-                                        actionLink.href = `comprar_billete.html?vuelo_id=${vuelo.ID}`;
-                                        actionLink.textContent = 'Comprar billete';
-                                        actionCell.appendChild(actionLink);
+                                        const actionCell = row.insertCell();                                        
+                                        const downloadLink = document.createElement('a');
+                                        downloadLink.href = "#";
+                                        downloadLink.textContent = 'Descargar información de vuelo';
+                                        downloadLink.onclick = function() {
+                                            descargarInformacionVuelo(vuelo.ID);
+                                        };
+                                        actionCell.appendChild(downloadLink);
                                     });
                             });
                     });
 
                     resultadosDiv.appendChild(table);
                 } else {
-                    Swal.fire({
-                        title: "Error",
-                        text: "No se encontraron vuelos que coincidan con los criterios de búsqueda.",
-                        icon: "error",
-                        confirmButtonText: "Aceptar"
-                    });
+                    resultadosDiv.textContent = 'No se encontraron vuelos que coincidan con los criterios de búsqueda.';
                 }
             });
         });
+
+        async function descargarInformacionVuelo(vueloId) {
+            try {
+                const vueloResponse = await fetch(`http://localhost/flight-service/index.php?action=read_vuelo&id=${vueloId}`);
+                const vuelo = await vueloResponse.json();
+        
+                const avionResponse = await fetch(`http://localhost/flight-service/index.php?action=read_avion&id=${vuelo.Avion_ID}`);
+                const avion = await avionResponse.json();
+        
+                const pasajerosVueloResponse = await fetch(`http://localhost/ticket-service/index.php?action=read_pasajeroenvuelo_by_vuelo&vuelo_id=${vuelo.ID}`);
+                const pasajerosVuelo = await pasajerosVueloResponse.json();
+        
+                const pasajerosResponse = await fetch(`http://localhost/ticket-service/index.php?action=read_pasajeros`);
+                const pasajeros = await pasajerosResponse.json();
+        
+                const pasajerosInfo = pasajerosVuelo.map(pv => {
+                    const pasajero = pasajeros.find(p => p.ID === pv.Pasajero_ID);
+                    return {
+                        ...pv,
+                        Nombre: pasajero.Nombre,
+                        Apellidos: pasajero.Apellidos,
+                        Fecha_Nac: pasajero.Fecha_Nac,
+                        Sexo: pasajero.Sexo
+                    };
+                });
+        
+                let csvContent = `Número vuelo;Número avión;Modelo Avión;Capacidad;Fecha;Origen;Destino;Precio;Hora\n`;
+                csvContent += `${vuelo.ID};${vuelo.Avion_ID};${avion.Modelo};${avion.Capacidad};${vuelo.Fecha};${vuelo.Origen};${vuelo.Destino};${vuelo.Precio};${vuelo.Hora}\n\n`;
+                csvContent += `Pasajeros:\nNúmero pasajero;Nombre;Apellidos;Fecha de Nacimiento;Sexo;Billete;Asiento\n`;
+        
+                pasajerosInfo.forEach(pv => {
+                    csvContent += `${pv.Pasajero_ID};${pv.Nombre};${pv.Apellidos};${pv.Fecha_Nac};${pv.Sexo};${pv.Billete};${pv.Asiento}\n`;
+                });
+        
+                const bom = '\uFEFF';
+                const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `vuelo_${vueloId}.csv`;
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                console.error("Error al descargar la información del vuelo:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al descargar la información del vuelo.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar"
+                });
+            }
+        }
+        
     </script>
 </body>
 </html>

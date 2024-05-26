@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       permisosHtml += `
               <a href='${baseUrl}/registrar_vuelos/agregar_avion.html'>Agregar Avión</a>
               <a href='${baseUrl}/registrar_vuelos/registrar_vuelo.html'>Registrar Vuelo</a>
+              <a href='${baseUrl}/registrar_vuelos/descargar_informacion_vuelo.html'>Descargar información de vuelo</a>
           `;
     }
 
