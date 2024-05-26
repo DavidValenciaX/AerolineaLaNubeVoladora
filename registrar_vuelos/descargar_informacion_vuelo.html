@@ -53,7 +53,7 @@
                 const permisosArray = Object.values(permissionsData.permisos);
 
                 // Verificar si el usuario tiene permiso para comprar billete
-                if (!permisosArray.includes("Comprar billete")) {
+                if (!permisosArray.includes("Registrar vuelos")) {
                     Swal.fire({
                         title: "Acceso denegado",
                         text: "No tienes permiso para acceder a esta página.",
